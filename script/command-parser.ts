@@ -22,11 +22,9 @@ export function showHelp(showRootDescription?: boolean): void {
     if (showRootDescription) {
       console.log(
         chalk.blue(`
- ____                 ____            _     
-|  _ \\ _____   _____ |  _ \\ _   _ ___| |__  
-| |_) / _ \\ \\ / / _ \\| |_) | | | / __| '_ \\ 
-|  _ <  __/\\ V / (_) |  __/| |_| \\__ \\ | | |
-|_| \\_\\___| \\_/ \\___/|_|    \\__,_|___/_| |_| CLI v${packageJson.version}
+  __  _   _    _           
+ (_  |_) /    |_)    _ |_  
+ __) | \ \_   | |_| _> | |  CLI v${packageJson.version}
 ============================================`)
       );
       console.log(
