@@ -135,11 +135,9 @@ which will display the version of the Source Push CLI you have installed with av
 
 ```shell
 srcpush -h
- ____                 ____            _     
-|  _ \ _____   _____ |  _ \ _   _ ___| |__  
-| |_) / _ \ \ / / _ \| |_) | | | / __| '_ \ 
-|  _ <  __/\ V / (_) |  __/| |_| \__ \ | | |
-|_| \_\___| \_/ \___/|_|    \__,_|___/_| |_| CLI v0.0.1
+  __  _   _    _           
+ (_  |_) /    |_)    _ |_  
+ __) | \ \_   | |_| _> | |   CLI v0.0.1
 ============================================
 Source Push is a service that enables you to deploy mobile app updates directly to your users devices. Visit our website https://srcpush.com/ 
 
