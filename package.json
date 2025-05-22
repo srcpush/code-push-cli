@@ -17,6 +17,10 @@
     "type": "git",
     "url": "https://github.com/srcpush/code-push-cli"
   },
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "author": "Microsoft",
   "contributors": [
     "Microsoft",
