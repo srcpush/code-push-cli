@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as rimraf from "rimraf";
+import { rimrafSync } from "rimraf";
 import * as temp from "temp";
 
 export function isBinaryOrZip(path: string): boolean {
@@ -22,7 +22,7 @@ export function fileExists(file: string): boolean {
 export function copyFileToTmpDir(filePath: string): string {
   if (!isDirectory(filePath)) {
     const outputFolderPath: string = temp.mkdirSync("code-push");
-    rimraf.sync(outputFolderPath);
+    rimrafSync(outputFolderPath);
     fs.mkdirSync(outputFolderPath);
 
     const outputFilePath: string = path.join(outputFolderPath, path.basename(filePath));

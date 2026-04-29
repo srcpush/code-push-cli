@@ -20,7 +20,7 @@ const progress = require("progress");
 const prompt = require("prompt");
 import * as Q from "q";
 
-const rimraf = require("rimraf");
+const { rimraf } = require("rimraf");
 import * as semver from "semver";
 
 const Table = require("cli-table");
@@ -277,15 +277,7 @@ function deleteConnectionInfoCache(printMessage: boolean = true): void {
 }
 
 function deleteFolder(folderPath: string): Promise<void> {
-  return Promise<void>((resolve, reject, notify) => {
-    rimraf(folderPath, (err: any) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(<void>null);
-      }
-    });
-  });
+  return rimraf(folderPath).then(() => undefined);
 }
 
 function deploymentAdd(command: cli.IDeploymentAddCommand): Promise<void> {
