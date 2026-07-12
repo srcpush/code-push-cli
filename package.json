@@ -73,7 +73,7 @@
     "yazl": "^3.3.1"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
+    "@eslint/js": "^9.39.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.15.21",
     "@types/semver": "^7.7.1",
