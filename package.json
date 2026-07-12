@@ -75,7 +75,7 @@
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
     "@vitest/coverage-v8": "^3.1.4",
-    "eslint": "^9.27.0",
+    "eslint": "^9.39.0",
     "express": "^4.21.2",
     "mkdirp": "^3.0.1",
     "prettier": "^3.5.3",
