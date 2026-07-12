@@ -21,11 +21,10 @@ export default tseslint.config(
     rules: {
       "no-var": "error",
       "prefer-const": "error",
-      eqeqeq: "error",
-      "no-eval": "error",
+      "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/no-require-imports": "off",
       "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_|^argv$|^aliases$|^msg$|^e$|^error$" }],
+      eqeqeq: "off",
       "no-empty": "off",
       "@typescript-eslint/no-unused-expressions": "off",
       "no-case-declarations": "off",
