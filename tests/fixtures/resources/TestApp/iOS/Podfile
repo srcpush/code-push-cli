@@ -1,4 +1,3 @@
-# Test fixture Podfile for release-react CLI tests
 platform :ios, '12.0'
 
 target 'TestApp' do
