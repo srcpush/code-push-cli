@@ -5,3 +5,4 @@ dist/
 bin/
 /___automation___.npmrc___
 coverage/
+.npm-cache/
