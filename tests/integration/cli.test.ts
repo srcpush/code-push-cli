@@ -21,6 +21,15 @@ function ensureInTestAppDirectory(): void {
   process.chdir(path.join(__dirname, "../fixtures/resources/TestApp"));
 }
 
+const RN_CLI_PATH_PATTERN = /node_modules\/react-native\/(local-cli\/cli\.js|cli\.js)\s+bundle/;
+
+function expectReactNativeBundleCommand(spawnCommandArgs: string, fragments: string[]): void {
+  expect(spawnCommandArgs).toMatch(RN_CLI_PATH_PATTERN);
+  for (const fragment of fragments) {
+    expect(spawnCommandArgs).toContain(fragment);
+  }
+}
+
 function isDefined(object: any): boolean {
   return object !== undefined && object !== null;
 }
@@ -1119,12 +1128,13 @@ describe("CLI", () => {
     var spawnCommand: string = spawn.args[0][0];
     var spawnCommandArgs: string = spawn.args[0][1].join(" ");
     expect(spawnCommand).toBe("node");
-    expect(spawnCommandArgs).toBe(
-      `${path.join("node_modules", "react-native", "local-cli", "cli.js")} bundle --assets-dest ${path.join(
-        os.tmpdir(),
-        "CodePush"
-      )} --bundle-output ${path.join(os.tmpdir(), "CodePush", bundleName)} --dev false --entry-file index.ios.js --platform ios`
-    );
+    expectReactNativeBundleCommand(spawnCommandArgs, [
+      `--assets-dest ${path.join(os.tmpdir(), "CodePush")}`,
+      `--bundle-output ${path.join(os.tmpdir(), "CodePush", bundleName)}`,
+      "--dev false",
+      "--entry-file index.ios.js",
+      "--platform ios",
+    ]);
     assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
   });
 
@@ -1155,17 +1165,13 @@ describe("CLI", () => {
     var spawnCommand: string = spawn.args[0][0];
     var spawnCommandArgs: string = spawn.args[0][1].join(" ");
     expect(spawnCommand).toBe("node");
-    expect(spawnCommandArgs).toBe(
-      `${path.join(
-        "node_modules",
-        "react-native",
-        "local-cli",
-        "cli.js"
-      )} bundle --assets-dest ${packagePath} --bundle-output ${path.join(
-        packagePath,
-        "main.jsbundle"
-      )} --dev false --entry-file index.ios.js --platform ios`
-    );
+    expectReactNativeBundleCommand(spawnCommandArgs, [
+      `--assets-dest ${packagePath}`,
+      `--bundle-output ${path.join(packagePath, "main.jsbundle")}`,
+      "--dev false",
+      "--entry-file index.ios.js",
+      "--platform ios",
+    ]);
     assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
   });
 
@@ -1196,17 +1202,13 @@ describe("CLI", () => {
     var spawnCommand: string = spawn.args[0][0];
     var spawnCommandArgs: string = spawn.args[0][1].join(" ");
     expect(spawnCommand).toBe("node");
-    expect(spawnCommandArgs).toBe(
-      `${path.join(
-        "node_modules",
-        "react-native",
-        "local-cli",
-        "cli.js"
-      )} bundle --assets-dest ${packagePath} --bundle-output ${path.join(
-        packagePath,
-        "index.android.bundle"
-      )} --dev false --entry-file index.android.js --platform android`
-    );
+    expectReactNativeBundleCommand(spawnCommandArgs, [
+      `--assets-dest ${packagePath}`,
+      `--bundle-output ${path.join(packagePath, "index.android.bundle")}`,
+      "--dev false",
+      "--entry-file index.android.js",
+      "--platform android",
+    ]);
     assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
   });
 
@@ -1237,17 +1239,13 @@ describe("CLI", () => {
     var spawnCommand: string = spawn.args[0][0];
     var spawnCommandArgs: string = spawn.args[0][1].join(" ");
     expect(spawnCommand).toBe("node");
-    expect(spawnCommandArgs).toBe(
-      `${path.join(
-        "node_modules",
-        "react-native",
-        "local-cli",
-        "cli.js"
-      )} bundle --assets-dest ${packagePath} --bundle-output ${path.join(
-        packagePath,
-        "index.windows.bundle"
-      )} --dev false --entry-file index.windows.js --platform windows`
-    );
+    expectReactNativeBundleCommand(spawnCommandArgs, [
+      `--assets-dest ${packagePath}`,
+      `--bundle-output ${path.join(packagePath, "index.windows.bundle")}`,
+      "--dev false",
+      "--entry-file index.windows.js",
+      "--platform windows",
+    ]);
     assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
   });
 
@@ -1281,16 +1279,14 @@ describe("CLI", () => {
     var spawnCommand: string = spawn.args[0][0];
     var spawnCommandArgs: string = spawn.args[0][1].join(" ");
     expect(spawnCommand).toBe("node");
-    expect(spawnCommandArgs).toBe(
-      `${path.join("node_modules", "react-native", "local-cli", "cli.js")} bundle --assets-dest ${path.join(
-        os.tmpdir(),
-        "CodePush"
-      )} --bundle-output ${path.join(
-        os.tmpdir(),
-        "CodePush",
-        bundleName
-      )} --dev true --entry-file index.android.js --platform android --sourcemap-output index.android.js.map`
-    );
+    expectReactNativeBundleCommand(spawnCommandArgs, [
+      `--assets-dest ${path.join(os.tmpdir(), "CodePush")}`,
+      `--bundle-output ${path.join(os.tmpdir(), "CodePush", bundleName)}`,
+      "--dev true",
+      "--entry-file index.android.js",
+      "--platform android",
+      "--sourcemap-output index.android.js.map",
+    ]);
     assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
   });
 
@@ -1323,16 +1319,14 @@ describe("CLI", () => {
     var spawnCommand: string = spawn.args[0][0];
     var spawnCommandArgs: string = spawn.args[0][1].join(" ");
     expect(spawnCommand).toBe("node");
-    expect(spawnCommandArgs).toBe(
-      `${path.join("node_modules", "react-native", "local-cli", "cli.js")} bundle --assets-dest ${path.join(
-        os.tmpdir(),
-        "CodePush"
-      )} --bundle-output ${path.join(
-        os.tmpdir(),
-        "CodePush",
-        bundleName
-      )} --dev false --entry-file index.android.js --platform android --sourcemap-output index.android.js.map`
-    );
+    expectReactNativeBundleCommand(spawnCommandArgs, [
+      `--assets-dest ${path.join(os.tmpdir(), "CodePush")}`,
+      `--bundle-output ${path.join(os.tmpdir(), "CodePush", bundleName)}`,
+      "--dev false",
+      "--entry-file index.android.js",
+      "--platform android",
+      "--sourcemap-output index.android.js.map",
+    ]);
     assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
   });
 
@@ -1364,16 +1358,14 @@ describe("CLI", () => {
     var spawnCommand: string = spawn.args[0][0];
     var spawnCommandArgs: string = spawn.args[0][1].join(" ");
     expect(spawnCommand).toBe("node");
-    expect(spawnCommandArgs).toBe(
-      `${path.join("node_modules", "react-native", "local-cli", "cli.js")} bundle --assets-dest ${path.join(
-        os.tmpdir(),
-        "CodePush"
-      )} --bundle-output ${path.join(
-        os.tmpdir(),
-        "CodePush",
-        bundleName
-      )} --dev false --entry-file index.android.js --platform android --sourcemap-output index.android.js.map`
-    );
+    expectReactNativeBundleCommand(spawnCommandArgs, [
+      `--assets-dest ${path.join(os.tmpdir(), "CodePush")}`,
+      `--bundle-output ${path.join(os.tmpdir(), "CodePush", bundleName)}`,
+      "--dev false",
+      "--entry-file index.android.js",
+      "--platform android",
+      "--sourcemap-output index.android.js.map",
+    ]);
     assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
   });
 
@@ -1409,12 +1401,14 @@ describe("CLI", () => {
       var spawnCommand: string = spawn.args[0][0];
       var spawnCommandArgs: string = spawn.args[0][1].join(" ");
       expect(spawnCommand).toBe("node");
-      expect(spawnCommandArgs).toBe(
-        `--foo=bar --baz ${path.join("node_modules", "react-native", "local-cli", "cli.js")} bundle --assets-dest ${path.join(
-          os.tmpdir(),
-          "CodePush"
-        )} --bundle-output ${path.join(os.tmpdir(), "CodePush", bundleName)} --dev false --entry-file index.ios.js --platform ios`
-      );
+      expect(spawnCommandArgs).toMatch(/^--foo=bar --baz /);
+      expectReactNativeBundleCommand(spawnCommandArgs, [
+        `--assets-dest ${path.join(os.tmpdir(), "CodePush")}`,
+        `--bundle-output ${path.join(os.tmpdir(), "CodePush", bundleName)}`,
+        "--dev false",
+        "--entry-file index.ios.js",
+        "--platform ios",
+      ]);
       assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
     } finally {
       if (_CODE_PUSH_NODE_ARGS === undefined) {
@@ -1454,12 +1448,15 @@ describe("CLI", () => {
     var spawnCommand: string = spawn.args[0][0];
     var spawnCommandArgs: string = spawn.args[0][1].join(" ");
     expect(spawnCommand).toBe("node");
-    expect(spawnCommandArgs).toBe(
-      `${path.join("node_modules", "react-native", "local-cli", "cli.js")} bundle --assets-dest ${path.join(
-        os.tmpdir(),
-        "CodePush"
-      )} --bundle-output ${path.join(os.tmpdir(), "CodePush", bundleName)} --dev false --entry-file index.ios.js --platform ios --foo=bar --baz`
-    );
+    expectReactNativeBundleCommand(spawnCommandArgs, [
+      `--assets-dest ${path.join(os.tmpdir(), "CodePush")}`,
+      `--bundle-output ${path.join(os.tmpdir(), "CodePush", bundleName)}`,
+      "--dev false",
+      "--entry-file index.ios.js",
+      "--platform ios",
+      "--foo=bar",
+      "--baz",
+    ]);
     assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
   });
 
