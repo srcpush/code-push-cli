@@ -1,4 +1,6 @@
 node_modules
+!tests/fixtures/resources/TestApp/node_modules/
+!tests/fixtures/resources/TestApp/node_modules/**
 .npmrc
 .idea
 dist/
