@@ -52,6 +52,10 @@ node dist/cli.js -h
 npm link   # optional: install `srcpush` globally
 ```
 
+## License
+
+MIT — see [LICENSE](../LICENSE) in the repository root.
+
 ## Hash utility sync
 
 `src/lib/hash.ts` must stay in sync with `api/src/utils/hash-utils.ts` in the monorepo. Any hashing change requires updating both files.
