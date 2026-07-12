@@ -1,6 +1,3 @@
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-
 // ./superagent-mock-config.js file
 module.exports = [
   {

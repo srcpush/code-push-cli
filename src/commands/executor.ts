@@ -1534,12 +1534,6 @@ function isCommandOptionSpecified(option: any): boolean {
 
 function getSdk(accessKey: string, headers: Headers, customServerUrl: string): AccountManager {
   const sdk: any = new AccountManager(accessKey, CLI_HEADERS, customServerUrl);
-  /*
-   * If the server returns `Unauthorized`, it must be due to an invalid
-   * (or expired) access key. For convenience, we patch every SDK call
-   * to delete the cached connection so the user can simply
-   * login again instead of having to log out first.
-   */
   Object.getOwnPropertyNames(AccountManager.prototype).forEach((functionName: any) => {
     if (typeof sdk[functionName] === "function") {
       const originalFunction = sdk[functionName];
