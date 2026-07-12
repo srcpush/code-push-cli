@@ -24,7 +24,9 @@
   },
   "files": [
     "dist",
-    "docs"
+    "docs",
+    "LICENSE",
+    "README.md"
   ],
   "repository": {
     "type": "git",
@@ -37,9 +39,10 @@
   "publishConfig": {
     "access": "public"
   },
-  "author": "Microsoft",
+  "license": "MIT",
+  "author": "Source Push",
   "contributors": [
-    "Microsoft",
+    "Microsoft Corporation",
     "Source Push"
   ],
   "dependencies": {
