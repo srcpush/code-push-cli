@@ -1105,7 +1105,7 @@ describe("CLI", () => {
     var command: cli.IReleaseReactCommand = {
       type: cli.CommandType.releaseReact,
       appName: "a",
-      appStoreVersion: null,
+      appStoreVersion: "1.2.3",
       bundleName: bundleName,
       deploymentName: "Staging",
       description: "Test default entry file",
@@ -1122,7 +1122,6 @@ describe("CLI", () => {
 
     var releaseCommand: cli.IReleaseCommand = <any>command;
     releaseCommand.package = path.join(os.tmpdir(), "CodePush");
-    releaseCommand.appStoreVersion = "1.2.3";
 
     sinon.assert.calledOnce(spawn);
     var spawnCommand: string = spawn.args[0][0];
@@ -1142,7 +1141,7 @@ describe("CLI", () => {
     var command: cli.IReleaseReactCommand = {
       type: cli.CommandType.releaseReact,
       appName: "a",
-      appStoreVersion: null,
+      appStoreVersion: "1.2.3",
       deploymentName: "Staging",
       description: "Test default entry file",
       mandatory: false,
@@ -1159,7 +1158,6 @@ describe("CLI", () => {
     var releaseCommand: cli.IReleaseCommand = <any>clone(command);
     var packagePath: string = path.join(os.tmpdir(), "CodePush");
     releaseCommand.package = packagePath;
-    releaseCommand.appStoreVersion = "1.2.3";
 
     sinon.assert.calledOnce(spawn);
     var spawnCommand: string = spawn.args[0][0];
@@ -1374,7 +1372,7 @@ describe("CLI", () => {
     var command: cli.IReleaseReactCommand = {
       type: cli.CommandType.releaseReact,
       appName: "a",
-      appStoreVersion: null,
+      appStoreVersion: "1.2.3",
       bundleName: bundleName,
       deploymentName: "Staging",
       description: "Test default entry file",
@@ -1395,7 +1393,6 @@ describe("CLI", () => {
 
       var releaseCommand: cli.IReleaseCommand = <any>command;
       releaseCommand.package = path.join(os.tmpdir(), "CodePush");
-      releaseCommand.appStoreVersion = "1.2.3";
 
       sinon.assert.calledOnce(spawn);
       var spawnCommand: string = spawn.args[0][0];
@@ -1424,7 +1421,7 @@ describe("CLI", () => {
     var command: cli.IReleaseReactCommand = {
       type: cli.CommandType.releaseReact,
       appName: "a",
-      appStoreVersion: null,
+      appStoreVersion: "1.2.3",
       bundleName: bundleName,
       deploymentName: "Staging",
       description: "Test default entry file",
@@ -1442,7 +1439,6 @@ describe("CLI", () => {
 
     var releaseCommand: cli.IReleaseCommand = <any>command;
     releaseCommand.package = path.join(os.tmpdir(), "CodePush");
-    releaseCommand.appStoreVersion = "1.2.3";
 
     sinon.assert.calledOnce(spawn);
     var spawnCommand: string = spawn.args[0][0];
