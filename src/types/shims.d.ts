@@ -1,0 +1,9 @@
+declare module "recursive-fs";
+declare module "yazl";
+declare module "gradle-to-js/lib/parser";
+declare module "cli-table";
+declare module "opener";
+declare module "properties";
+declare module "progress";
+declare module "email-validator";
+declare module "xcode";

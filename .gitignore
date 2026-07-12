@@ -1,7 +1,10 @@
 node_modules
+!tests/fixtures/resources/TestApp/node_modules/
+!tests/fixtures/resources/TestApp/node_modules/**
 .npmrc
 .idea
-../api/node_modules
-../api/node_modules
-/bin/
+dist/
+bin/
 /___automation___.npmrc___
+coverage/
+.npm-cache/

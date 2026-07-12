@@ -1,13 +1,22 @@
 {
-    "compilerOptions": {
-      "module": "commonjs",
-      "noImplicitAny": false,
-      "target": "ES2022",
-      "outDir": "./bin",
-      "skipLibCheck": true,
-    },
-    "exclude": [
-      "./bin",
-      "./node_modules"
-    ]
-  }
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022"],
+    "strict": true,
+    "noImplicitAny": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src/**/*", "tests/**/*", "vite.config.ts", "vitest.config.ts"],
+  "exclude": ["dist", "node_modules"]
+}
