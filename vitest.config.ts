@@ -8,6 +8,7 @@ export default defineConfig({
     setupFiles: ["tests/helpers/setup.ts"],
     testTimeout: 30000,
     restoreMocks: true,
+    fileParallelism: false,
   },
   resolve: {
     alias: {
