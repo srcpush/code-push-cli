@@ -1,5 +1,3 @@
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
 
 interface AccessKeyBase {
   createdBy?: string;
@@ -148,5 +146,3 @@ export interface Package extends PackageInfo {
   /*generated*/ size: number;
   /*generated*/ uploadTime: number;
 }
-
-export * from "./rest-definitions";

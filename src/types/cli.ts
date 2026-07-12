@@ -1,7 +1,5 @@
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
 
-import AccountManager = require("../management-sdk");
+import type AccountManager from "../sdk/management";
 
 export enum CommandType {
   accessKeyAdd,
@@ -227,9 +225,9 @@ export type ReleaseHook = (
   currentCommand: IReleaseCommand,
   originalCommand: IReleaseCommand,
   sdk: AccountManager
-) => Q.Promise<IReleaseCommand | void>;
+) => Promise<IReleaseCommand | void>;
 
 export interface ReleaseFile {
-  sourceLocation: string; // The current location of the file on disk
-  targetLocation: string; // The desired location of the file within the zip
+  sourceLocation: string;
+  targetLocation: string;
 }

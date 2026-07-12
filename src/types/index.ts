@@ -1,5 +1,3 @@
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
 
 export {
   AccessKeyRequest,
@@ -13,7 +11,7 @@ export {
   PackageInfo,
   AccessKey as ServerAccessKey,
   UpdateMetrics,
-} from "../script/types/rest-definitions";
+} from "./rest-definitions";
 
 export interface CodePushError {
   message: string;

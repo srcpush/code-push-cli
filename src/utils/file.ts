@@ -3,21 +3,21 @@ import * as path from "path";
 import { rimrafSync } from "rimraf";
 import * as temp from "temp";
 
-export function isBinaryOrZip(path: string): boolean {
-  return path.search(/\.zip$/i) !== -1 || path.search(/\.apk$/i) !== -1 || path.search(/\.ipa$/i) !== -1;
+export function isBinaryOrZip(filePath: string): boolean {
+  return filePath.search(/\.zip$/i) !== -1 || filePath.search(/\.apk$/i) !== -1 || filePath.search(/\.ipa$/i) !== -1;
 }
 
-export function isDirectory(path: string): boolean {
-  return fs.statSync(path).isDirectory();
+export function isDirectory(filePath: string): boolean {
+  return fs.statSync(filePath).isDirectory();
 }
 
 export function fileExists(file: string): boolean {
   try {
     return fs.statSync(file).isFile();
-  } catch (e) {
+  } catch {
     return false;
   }
-};
+}
 
 export function copyFileToTmpDir(filePath: string): string {
   if (!isDirectory(filePath)) {
@@ -30,17 +30,18 @@ export function copyFileToTmpDir(filePath: string): string {
 
     return outputFolderPath;
   }
+
+  return filePath;
 }
 
-export function fileDoesNotExistOrIsDirectory(path: string): boolean {
+export function fileDoesNotExistOrIsDirectory(filePath: string): boolean {
   try {
-    return isDirectory(path);
-  } catch (error) {
+    return isDirectory(filePath);
+  } catch {
     return true;
   }
 }
 
 export function normalizePath(filePath: string): string {
-  //replace all backslashes coming from cli running on windows machines by slashes
   return filePath.replace(/\\/g, "/");
 }

@@ -1,20 +1,17 @@
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
 
 import * as yargs from "yargs";
-import * as cli from "../script/types/cli";
-import * as chalk from "chalk";
-import backslash = require("backslash");
-import parseDurationModule = require("parse-duration");
-const parseDuration: (str: string) => number = parseDurationModule.default;
+import * as cli from "../types/cli";
+import chalk from "chalk";
+const parseDuration: (str: string) => number = require("parse-duration");
+
+function unescapeDescription(value: string): string {
+  return value.replace(/\\n/g, "\n").replace(/\\t/g, "\t").replace(/\\\\/g, "\\");
+}
 
 const packageJson = require("../../package.json");
 const ROLLOUT_PERCENTAGE_REGEX: RegExp = /^(100|[1-9][0-9]|[1-9])%?$/;
 const USAGE_PREFIX = "Usage: srcpush";
 
-// Command categories are:  access-key, app, release, deployment, deployment-key, login, logout, register
-let isValidCommandCategory = false;
-// Commands are the verb following the command category (e.g.:  "add" in "app add").
 let isValidCommand = false;
 let wasHelpShown = false;
 
@@ -22,7 +19,7 @@ export function showHelp(showRootDescription?: boolean): void {
   if (!wasHelpShown) {
     if (showRootDescription) {
       console.log(
-        chalk.blue(`
+        chalk.blue(String.raw`
   __  _   _    _           
  (_  |_) /    |_)    _ |_  
  __) | \ \_   | |_| _> | |  CLI v${packageJson.version}
@@ -43,7 +40,7 @@ function accessKeyAdd(commandName: string, yargs: yargs.Argv): void {
   isValidCommand = true;
   yargs
     .usage(USAGE_PREFIX + " access-key " + commandName + " <accessKeyName>")
-    .demand(/*count*/ 1, /*max*/ 1) // Require exactly one non-option arguments
+    .demand(1, 1)
     .example(
       "access-key " + commandName + ' "VSTS Integration"',
       'Creates a new access key with the name "VSTS Integration", which expires in 60 days'
@@ -66,7 +63,7 @@ function accessKeyPatch(commandName: string, yargs: yargs.Argv): void {
   isValidCommand = true;
   yargs
     .usage(USAGE_PREFIX + " access-key " + commandName + " <accessKeyName>")
-    .demand(/*count*/ 1, /*max*/ 1) // Require exactly one non-option arguments
+    .demand(1, 1)
     .example(
       "access-key " + commandName + ' "Key for build server" --name "Key for CI machine"',
       'Renames the access key named "Key for build server" to "Key for CI machine"'
@@ -94,7 +91,7 @@ function accessKeyList(commandName: string, yargs: yargs.Argv): void {
   isValidCommand = true;
   yargs
     .usage(USAGE_PREFIX + " access-key " + commandName + " [options]")
-    .demand(/*count*/ 0, /*max*/ 0)
+    .demand(0, 0)
     .example("access-key " + commandName, "Lists your access keys in tabular format")
     .example("access-key " + commandName + " --format json", "Lists your access keys in JSON format")
     .option("format", {
@@ -111,7 +108,7 @@ function accessKeyRemove(commandName: string, yargs: yargs.Argv): void {
   isValidCommand = true;
   yargs
     .usage(USAGE_PREFIX + " access-key " + commandName + " <accessKeyName>")
-    .demand(/*count*/ 1, /*max*/ 1) // Require exactly one non-option arguments
+    .demand(1, 1)
     .example("access-key " + commandName + ' "VSTS Integration"', 'Removes the "VSTS Integration" access key');
 
   addCommonConfiguration(yargs);
@@ -119,7 +116,7 @@ function accessKeyRemove(commandName: string, yargs: yargs.Argv): void {
 
 function addCommonConfiguration(yargs: yargs.Argv): void {
   yargs
-    .wrap(/*columnLimit*/ null)
+    .wrap(null)
     .string("_") // Interpret non-hyphenated arguments as strings (e.g. an app version of '1.10').
     .fail((msg: string) => showHelp()); // Suppress the default error message.
 }
@@ -128,7 +125,7 @@ function appList(commandName: string, yargs: yargs.Argv): void {
   isValidCommand = true;
   yargs
     .usage(USAGE_PREFIX + " app " + commandName + " [options]")
-    .demand(/*count*/ 0, /*max*/ 0)
+    .demand(0, 0)
     .example("app " + commandName, "List your apps in tabular format")
     .example("app " + commandName + " --format json", "List your apps in JSON format")
     .option("format", {
@@ -145,7 +142,7 @@ function appRemove(commandName: string, yargs: yargs.Argv): void {
   isValidCommand = true;
   yargs
     .usage(USAGE_PREFIX + " app " + commandName + " <appName>")
-    .demand(/*count*/ 1, /*max*/ 1) // Require exactly one non-option arguments
+    .demand(1, 1)
     .example("app " + commandName + " MyApp", 'Removes app "MyApp"');
 
   addCommonConfiguration(yargs);
@@ -155,7 +152,7 @@ function listCollaborators(commandName: string, yargs: yargs.Argv): void {
   isValidCommand = true;
   yargs
     .usage(USAGE_PREFIX + " collaborator " + commandName + " <appName> [options]")
-    .demand(/*count*/ 1, /*max*/ 1) // Require exactly one non-option arguments
+    .demand(1, 1)
     .example("collaborator " + commandName + " MyApp", 'Lists the collaborators for app "MyApp" in tabular format')
     .example("collaborator " + commandName + " MyApp --format json", 'Lists the collaborators for app "MyApp" in JSON format')
     .option("format", {
@@ -172,7 +169,7 @@ function removeCollaborator(commandName: string, yargs: yargs.Argv): void {
   isValidCommand = true;
   yargs
     .usage(USAGE_PREFIX + " collaborator " + commandName + " <appName> <email>")
-    .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
+    .demand(2, 2)
     .example("collaborator " + commandName + " MyApp foo@bar.com", 'Removes foo@bar.com as a collaborator from app "MyApp"');
 
   addCommonConfiguration(yargs);
@@ -182,7 +179,7 @@ function sessionList(commandName: string, yargs: yargs.Argv): void {
   isValidCommand = true;
   yargs
     .usage(USAGE_PREFIX + " session " + commandName + " [options]")
-    .demand(/*count*/ 0, /*max*/ 0)
+    .demand(0, 0)
     .example("session " + commandName, "Lists your sessions in tabular format")
     .example("session " + commandName + " --format json", "Lists your login sessions in JSON format")
     .option("format", {
@@ -199,7 +196,7 @@ function sessionRemove(commandName: string, yargs: yargs.Argv): void {
   isValidCommand = true;
   yargs
     .usage(USAGE_PREFIX + " session " + commandName + " <machineName>")
-    .demand(/*count*/ 1, /*max*/ 1) // Require exactly one non-option arguments
+    .demand(1, 1)
     .example("session " + commandName + ' "John\'s PC"', 'Removes the existing login session from "John\'s PC"');
 
   addCommonConfiguration(yargs);
@@ -209,7 +206,7 @@ function deploymentHistoryClear(commandName: string, yargs: yargs.Argv): void {
   isValidCommand = true;
   yargs
     .usage(USAGE_PREFIX + " deployment " + commandName + " <appName> <deploymentName>")
-    .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
+    .demand(2, 2)
     .example(
       "deployment " + commandName + " MyApp MyDeployment",
       'Clears the release history associated with deployment "MyDeployment" from app "MyApp"'
@@ -222,7 +219,7 @@ function deploymentList(commandName: string, yargs: yargs.Argv): void {
   isValidCommand = true;
   yargs
     .usage(USAGE_PREFIX + " deployment " + commandName + " <appName> [options]")
-    .demand(/*count*/ 1, /*max*/ 1) // Require exactly one non-option arguments
+    .demand(1, 1)
     .example("deployment " + commandName + " MyApp", 'Lists the deployments for app "MyApp" in tabular format')
     .example("deployment " + commandName + " MyApp --format json", 'Lists the deployments for app "MyApp" in JSON format')
     .option("format", {
@@ -245,7 +242,7 @@ function deploymentRemove(commandName: string, yargs: yargs.Argv): void {
   isValidCommand = true;
   yargs
     .usage(USAGE_PREFIX + " deployment " + commandName + " <appName> <deploymentName>")
-    .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
+    .demand(2, 2)
     .example("deployment " + commandName + " MyApp MyDeployment", 'Removes deployment "MyDeployment" from app "MyApp"');
 
   addCommonConfiguration(yargs);
@@ -255,7 +252,7 @@ function deploymentHistory(commandName: string, yargs: yargs.Argv): void {
   isValidCommand = true;
   yargs
     .usage(USAGE_PREFIX + " deployment " + commandName + " <appName> <deploymentName> [options]")
-    .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
+    .demand(2, 2)
     .example(
       "deployment " + commandName + " MyApp MyDeployment",
       'Displays the release history for deployment "MyDeployment" from app "MyApp" in tabular format'
@@ -283,12 +280,11 @@ function deploymentHistory(commandName: string, yargs: yargs.Argv): void {
 
 yargs
   .usage(USAGE_PREFIX + " <command>")
-  .demand(/*count*/ 1, /*max*/ 1) // Require exactly one non-option argument.
+  .demand(1, 1)
   .command("access-key", "View and manage the access keys associated with your account", (yargs: yargs.Argv) => {
-    isValidCommandCategory = true;
     yargs
       .usage(USAGE_PREFIX + " access-key <command>")
-      .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments.
+      .demand(2, 2)
       .command("add", "Create a new access key associated with your account", (yargs: yargs.Argv) => accessKeyAdd("add", yargs))
       .command("patch", "Update the name and/or TTL of an existing access key", (yargs: yargs.Argv) => accessKeyPatch("patch", yargs))
       .command("remove", "Remove an existing access key", (yargs: yargs.Argv) => accessKeyRemove("remove", yargs))
@@ -300,15 +296,14 @@ yargs
     addCommonConfiguration(yargs);
   })
   .command("app", "View and manage your CodePush apps", (yargs: yargs.Argv) => {
-    isValidCommandCategory = true;
     yargs
       .usage(USAGE_PREFIX + " app <command>")
-      .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments.
+      .demand(2, 2)
       .command("add", "Add a new app to your account", (yargs: yargs.Argv): void => {
         isValidCommand = true;
         yargs
           .usage(USAGE_PREFIX + " app add <appName>")
-          .demand(/*count*/ 1, /*max*/ 1) // Require exactly one non-option arguments
+          .demand(1, 1)
           .example("app add MyApp", 'Adds app "MyApp"');
 
         addCommonConfiguration(yargs);
@@ -319,7 +314,7 @@ yargs
         isValidCommand = true;
         yargs
           .usage(USAGE_PREFIX + " app rename <currentAppName> <newAppName>")
-          .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
+          .demand(2, 2)
           .example("app rename CurrentName NewName", 'Renames app "CurrentName" to "NewName"');
 
         addCommonConfiguration(yargs);
@@ -330,7 +325,7 @@ yargs
         isValidCommand = true;
         yargs
           .usage(USAGE_PREFIX + " app transfer <appName> <email>")
-          .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
+          .demand(2, 2)
           .example("app transfer MyApp foo@bar.com", 'Transfers the ownership of app "MyApp" to an account with email "foo@bar.com"');
 
         addCommonConfiguration(yargs);
@@ -340,15 +335,14 @@ yargs
     addCommonConfiguration(yargs);
   })
   .command("collaborator", "View and manage app collaborators", (yargs: yargs.Argv) => {
-    isValidCommandCategory = true;
     yargs
       .usage(USAGE_PREFIX + " collaborator <command>")
-      .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments.
+      .demand(2, 2)
       .command("add", "Add a new collaborator to an app", (yargs: yargs.Argv): void => {
         isValidCommand = true;
         yargs
           .usage(USAGE_PREFIX + " collaborator add <appName> <email>")
-          .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
+          .demand(2, 2)
           .example("collaborator add MyApp foo@bar.com", 'Adds foo@bar.com as a collaborator to app "MyApp"');
 
         addCommonConfiguration(yargs);
@@ -362,26 +356,24 @@ yargs
     addCommonConfiguration(yargs);
   })
   .command("debug", "View the CodePush debug logs for a running app", (yargs: yargs.Argv) => {
-    isValidCommandCategory = true;
     isValidCommand = true;
     yargs
       .usage(USAGE_PREFIX + " debug <platform>")
-      .demand(/*count*/ 1, /*max*/ 1) // Require exactly one non-option arguments
+      .demand(1, 1)
       .example("debug android", "View the CodePush debug logs for an Android emulator or device")
       .example("debug ios", "View the CodePush debug logs for the iOS simulator");
 
     addCommonConfiguration(yargs);
   })
   .command("deployment", "View and manage your app deployments", (yargs: yargs.Argv) => {
-    isValidCommandCategory = true;
     yargs
       .usage(USAGE_PREFIX + " deployment <command>")
-      .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments.
+      .demand(2, 2)
       .command("add", "Add a new deployment to an app", (yargs: yargs.Argv): void => {
         isValidCommand = true;
         yargs
           .usage(USAGE_PREFIX + " deployment add <appName> <deploymentName>")
-          .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
+          .demand(2, 2)
           .example("deployment add MyApp MyDeployment", 'Adds deployment "MyDeployment" to app "MyApp"')
           .example("deployment add MyApp MyDeployment -k abc123", 'Adds deployment key "abc123"')
           .option("key", {
@@ -402,7 +394,7 @@ yargs
         isValidCommand = true;
         yargs
           .usage(USAGE_PREFIX + " deployment rename <appName> <currentDeploymentName> <newDeploymentName>")
-          .demand(/*count*/ 3, /*max*/ 3) // Require exactly three non-option arguments
+          .demand(3, 3)
           .example(
             "deployment rename MyApp CurrentDeploymentName NewDeploymentName",
             'Renames deployment "CurrentDeploymentName" to "NewDeploymentName"'
@@ -418,23 +410,11 @@ yargs
 
     addCommonConfiguration(yargs);
   })
-  /*  .command("link", "Link an additional authentication provider (e.g. GitHub) to an existing CodePush account", (yargs: yargs.Argv) => {
-        isValidCommandCategory = true;
-        isValidCommand = true;
-        yargs
-          .usage(USAGE_PREFIX + " link")
-          .demand(/!*count*!/ 0, /!*max*!/ 1) //set 'max' to one to allow usage of serverUrl undocument parameter for testing
-          .example("link", "Links an account on the CodePush server")
-          .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand); // Report unrecognized, non-hyphenated command category.
-
-        addCommonConfiguration(yargs);
-      })*/
   .command("login", "Authenticate with the CodePush server in order to begin managing your apps", (yargs: yargs.Argv) => {
-    isValidCommandCategory = true;
     isValidCommand = true;
     yargs
       .usage(USAGE_PREFIX + " login [options]")
-      .demand(/*count*/ 0, /*max*/ 2) //set 'max' to one to allow usage of serverUrl undocument parameter for testing
+      .demand(0, 2)
       .example("login", "Logs in to the CodePush server")
       .example("login --accessKey mykey", 'Logs in on behalf of the user who owns and created the access key "mykey"')
       .option("accessKey", {
@@ -450,18 +430,17 @@ yargs
     addCommonConfiguration(yargs);
   })
   .command("logout", "Log out of the current session", (yargs: yargs.Argv) => {
-    isValidCommandCategory = true;
     isValidCommand = true;
     yargs
       .usage(USAGE_PREFIX + " logout")
-      .demand(/*count*/ 0, /*max*/ 0)
+      .demand(0, 0)
       .example("logout", "Logs out and ends your current session");
     addCommonConfiguration(yargs);
   })
   .command("patch", "Update the metadata for an existing release", (yargs: yargs.Argv) => {
     yargs
       .usage(USAGE_PREFIX + " patch <appName> <deploymentName> [options]")
-      .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
+      .demand(2, 2)
       .example(
         'patch MyApp Production --des "Updated description" -r 50%',
         'Updates the description of the latest release for "MyApp" app\'s "Production" deployment and updates the rollout value to 50%'
@@ -522,7 +501,7 @@ yargs
   .command("promote", "Promote the latest release from one app deployment to another", (yargs: yargs.Argv) => {
     yargs
       .usage(USAGE_PREFIX + " promote <appName> <sourceDeploymentName> <destDeploymentName> [options]")
-      .demand(/*count*/ 3, /*max*/ 3) // Require exactly three non-option arguments
+      .demand(3, 3)
       .example(
         "promote MyApp Staging Production",
         'Promotes the latest release within the "Staging" deployment of "MyApp" to "Production"'
@@ -591,11 +570,10 @@ yargs
     addCommonConfiguration(yargs);
   })
   .command("register", "Register a new CodePush account", (yargs: yargs.Argv) => {
-    isValidCommandCategory = true;
     isValidCommand = true;
     yargs
       .usage(USAGE_PREFIX + " register")
-      .demand(/*count*/ 0, /*max*/ 1) //set 'max' to one to allow usage of serverUrl undocument parameter for testing
+      .demand(0, 1)
       .example("register", "Registers a new CodePush account")
       .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand); // Report unrecognized, non-hyphenated command category.
 
@@ -604,7 +582,7 @@ yargs
   .command("release", "Release an update to an app deployment", (yargs: yargs.Argv) => {
     yargs
       .usage(USAGE_PREFIX + " release <appName> <updateContentsPath> <targetBinaryVersion> [options]")
-      .demand(/*count*/ 3, /*max*/ 3) // Require exactly three non-option arguments.
+      .demand(3, 3)
       .example(
         'release MyApp app.js "*"',
         'Releases the "app.js" file to the "MyApp" app\'s "Staging" deployment, targeting any binary version using the "*" wildcard range syntax.'
@@ -668,7 +646,7 @@ yargs
   .command("release-react", "Release a React Native update to an app deployment", (yargs: yargs.Argv) => {
     yargs
       .usage(USAGE_PREFIX + " release-react <appName> <platform> [options]")
-      .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
+      .demand(2, 2)
       .example(
         "release-react MyApp ios",
         'Releases the React Native iOS project in the current working directory to the "MyApp" app\'s "Staging" deployment'
@@ -856,7 +834,7 @@ yargs
   .command("rollback", "Rollback the latest release for an app deployment", (yargs: yargs.Argv) => {
     yargs
       .usage(USAGE_PREFIX + " rollback <appName> <deploymentName> [options]")
-      .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
+      .demand(2, 2)
       .example("rollback MyApp Production", 'Performs a rollback on the "Production" deployment of "MyApp"')
       .example(
         "rollback MyApp Production --targetRelease v4",
@@ -874,10 +852,9 @@ yargs
     addCommonConfiguration(yargs);
   })
   .command("session", "View and manage the current login sessions associated with your account", (yargs: yargs.Argv) => {
-    isValidCommandCategory = true;
     yargs
       .usage(USAGE_PREFIX + " session <command>")
-      .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments.
+      .demand(2, 2)
       .command("remove", "Remove an existing login session", (yargs: yargs.Argv) => sessionRemove("remove", yargs))
       .command("rm", "Remove an existing login session", (yargs: yargs.Argv) => sessionRemove("rm", yargs))
       .command("list", "List the current login sessions associated with your account", (yargs: yargs.Argv) =>
@@ -889,18 +866,17 @@ yargs
     addCommonConfiguration(yargs);
   })
   .command("whoami", "Display the account info for the current login session", (yargs: yargs.Argv) => {
-    isValidCommandCategory = true;
     isValidCommand = true;
     yargs
       .usage(USAGE_PREFIX + " whoami")
-      .demand(/*count*/ 0, /*max*/ 0)
+      .demand(0, 0)
       .example("whoami", "Display the account info for the current login session");
     addCommonConfiguration(yargs);
   })
   .alias("v", "version")
   .version(packageJson.version)
-  .wrap(/*columnLimit*/ null)
-  .fail((msg: string) => showHelp(/*showRootDescription*/ true)).argv; // Suppress the default error message.
+  .wrap(null)
+  .fail(() => showHelp(true)).argv; // Suppress the default error message.
 
 export function createCommand(): cli.ICommand {
   let cmd: cli.ICommand;
@@ -1137,13 +1113,6 @@ export function createCommand(): cli.ICommand {
         }
         break;
 
-      /*      case "link":
-                    cmd = <cli.ILinkCommand>{
-                      type: cli.CommandType.link,
-                      serverUrl: getServerUrl(arg1),
-                    };
-                    break;*/
-
       case "login":
         cmd = { type: cli.CommandType.login };
 
@@ -1168,7 +1137,7 @@ export function createCommand(): cli.ICommand {
           patchCommand.deploymentName = arg2;
           patchCommand.label = argv["label"] as any;
           // Description must be set to null to indicate that it is not being patched.
-          patchCommand.description = argv["description"] ? backslash(argv["description"]) : null;
+          patchCommand.description = argv["description"] ? unescapeDescription(argv["description"] as string) : null;
           patchCommand.disabled = argv["disabled"] as any;
           patchCommand.mandatory = argv["mandatory"] as any;
           patchCommand.rollout = getRolloutValue(argv["rollout"] as any);
@@ -1185,7 +1154,7 @@ export function createCommand(): cli.ICommand {
           deploymentPromoteCommand.appName = arg1;
           deploymentPromoteCommand.sourceDeploymentName = arg2;
           deploymentPromoteCommand.destDeploymentName = arg3;
-          deploymentPromoteCommand.description = argv["description"] ? backslash(argv["description"]) : "";
+          deploymentPromoteCommand.description = argv["description"] ? unescapeDescription(argv["description"] as string) : "";
           deploymentPromoteCommand.label = argv["label"] as any;
           deploymentPromoteCommand.disabled = argv["disabled"] as any;
           deploymentPromoteCommand.mandatory = argv["mandatory"] as any;
@@ -1213,7 +1182,7 @@ export function createCommand(): cli.ICommand {
           releaseCommand.package = arg2;
           releaseCommand.appStoreVersion = arg3;
           releaseCommand.deploymentName = argv["deploymentName"] as any;
-          releaseCommand.description = argv["description"] ? backslash(argv["description"]) : "";
+          releaseCommand.description = argv["description"] ? unescapeDescription(argv["description"] as string) : "";
           releaseCommand.disabled = argv["disabled"] as any;
           releaseCommand.mandatory = argv["mandatory"] as any;
           releaseCommand.noDuplicateReleaseError = argv["noDuplicateReleaseError"] as any;
@@ -1234,7 +1203,7 @@ export function createCommand(): cli.ICommand {
           releaseReactCommand.bundleName = argv["bundleName"] as any;
           releaseReactCommand.deploymentName = argv["deploymentName"] as any;
           releaseReactCommand.disabled = argv["disabled"] as any;
-          releaseReactCommand.description = argv["description"] ? backslash(argv["description"]) : "";
+          releaseReactCommand.description = argv["description"] ? unescapeDescription(argv["description"] as string) : "";
           releaseReactCommand.development = argv["development"] as any;
           releaseReactCommand.entryFile = argv["entryFile"] as any;
           releaseReactCommand.gradleFile = argv["gradleFile"] as any;

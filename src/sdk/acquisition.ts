@@ -1,9 +1,7 @@
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
 
-import { UpdateCheckResponse, UpdateCheckRequest, DeploymentStatusReport, DownloadReport } from "../script/types/rest-definitions";
+import { UpdateCheckResponse, UpdateCheckRequest, DeploymentStatusReport, DownloadReport } from "../types/rest-definitions";
 
-export module Http {
+export namespace Http {
   export const enum Verb {
     GET,
     HEAD,
@@ -27,8 +25,6 @@ export module Http {
   }
 }
 
-// All fields are non-nullable, except when retrieving the currently running package on the first run of the app,
-// in which case only the appVersion is compulsory
 export interface Package {
   deploymentKey: string;
   description: string;
@@ -44,7 +40,7 @@ export interface RemotePackage extends Package {
 }
 
 export interface NativeUpdateNotification {
-  updateAppVersion: boolean; // Always true
+  updateAppVersion: boolean;
   appVersion: string;
 }
 
@@ -53,7 +49,7 @@ export interface LocalPackage extends Package {
 }
 
 export interface Callback<T> {
-  (error: Error, parameter: T): void;
+  (error: Error | null, parameter: T | null): void;
 }
 
 export interface Configuration {
@@ -88,12 +84,15 @@ export class AcquisitionManager {
     this._appVersion = configuration.appVersion;
     this._clientUniqueId = configuration.clientUniqueId;
     this._deploymentKey = configuration.deploymentKey;
-    this._ignoreAppVersion = configuration.ignoreAppVersion;
+    this._ignoreAppVersion = configuration.ignoreAppVersion ?? false;
   }
 
-  public queryUpdateWithCurrentPackage(currentPackage: Package, callback?: Callback<RemotePackage | NativeUpdateNotification>): void {
+  public queryUpdateWithCurrentPackage(
+    currentPackage: Package,
+    callback?: Callback<RemotePackage | NativeUpdateNotification>
+  ): void {
     if (!currentPackage || !currentPackage.appVersion) {
-      throw new Error("Calling common acquisition SDK with incorrect package"); // Unexpected; indicates error in our implementation
+      throw new Error("Calling common acquisition SDK with incorrect package");
     }
 
     const updateRequest: UpdateCheckRequest = {
@@ -107,53 +106,53 @@ export class AcquisitionManager {
 
     const requestUrl: string = this._serverUrl + "updateCheck?" + queryStringify(updateRequest);
 
-    this._httpRequester.request(Http.Verb.GET, requestUrl, (error: Error, response: Http.Response) => {
+    this._httpRequester.request(Http.Verb.GET, requestUrl, (error: Error | null, response: Http.Response) => {
       if (error) {
-        callback(error, /*remotePackage=*/ null);
+        callback?.(error, null);
         return;
       }
 
       if (response.statusCode !== 200) {
-        callback(new Error(response.statusCode + ": " + response.body), /*remotePackage=*/ null);
+        callback?.(new Error(response.statusCode + ": " + response.body), null);
         return;
       }
 
       let updateInfo: UpdateCheckResponse;
 
       try {
-        const responseObject = JSON.parse(response.body);
+        const responseObject = JSON.parse(response.body ?? "");
         updateInfo = responseObject.updateInfo;
-      } catch (error) {
-        callback(error, /*remotePackage=*/ null);
+      } catch (parseError) {
+        callback?.(parseError as Error, null);
         return;
       }
 
       if (!updateInfo) {
-        callback(error, /*remotePackage=*/ null);
+        callback?.(null, null);
         return;
       } else if (updateInfo.updateAppVersion) {
-        callback(/*error=*/ null, {
+        callback?.(null, {
           updateAppVersion: true,
-          appVersion: updateInfo.appVersion,
+          appVersion: updateInfo.appVersion!,
         });
         return;
       } else if (!updateInfo.isAvailable) {
-        callback(/*error=*/ null, /*remotePackage=*/ null);
+        callback?.(null, null);
         return;
       }
 
       const remotePackage: RemotePackage = {
         deploymentKey: this._deploymentKey,
-        description: updateInfo.description,
-        label: updateInfo.label,
-        appVersion: updateInfo.appVersion,
-        isMandatory: updateInfo.isMandatory,
-        packageHash: updateInfo.packageHash,
-        packageSize: updateInfo.packageSize,
-        downloadUrl: updateInfo.downloadURL,
+        description: updateInfo.description!,
+        label: updateInfo.label!,
+        appVersion: updateInfo.appVersion!,
+        isMandatory: updateInfo.isMandatory!,
+        packageHash: updateInfo.packageHash!,
+        packageSize: updateInfo.packageSize!,
+        downloadUrl: updateInfo.downloadURL!,
       };
 
-      callback(/*error=*/ null, remotePackage);
+      callback?.(null, remotePackage);
     });
   }
 
@@ -187,9 +186,9 @@ export class AcquisitionManager {
         default:
           if (callback) {
             if (!status) {
-              callback(new Error("Missing status argument."), /*not used*/ null);
+              callback(new Error("Missing status argument."), null);
             } else {
-              callback(new Error('Unrecognized status "' + status + '".'), /*not used*/ null);
+              callback(new Error('Unrecognized status "' + status + '".'), null);
             }
           }
           return;
@@ -204,21 +203,24 @@ export class AcquisitionManager {
       body.previousDeploymentKey = previousDeploymentKey;
     }
 
-    callback = typeof arguments[arguments.length - 1] === "function" && arguments[arguments.length - 1];
+    const resolvedCallback =
+      typeof arguments[arguments.length - 1] === "function"
+        ? (arguments[arguments.length - 1] as Callback<void>)
+        : callback;
 
-    this._httpRequester.request(Http.Verb.POST, url, JSON.stringify(body), (error: Error, response: Http.Response): void => {
-      if (callback) {
+    this._httpRequester.request(Http.Verb.POST, url, JSON.stringify(body), (error: Error | null, response: Http.Response): void => {
+      if (resolvedCallback) {
         if (error) {
-          callback(error, /*not used*/ null);
+          resolvedCallback(error, null);
           return;
         }
 
         if (response.statusCode !== 200) {
-          callback(new Error(response.statusCode + ": " + response.body), /*not used*/ null);
+          resolvedCallback(new Error(response.statusCode + ": " + response.body), null);
           return;
         }
 
-        callback(/*error*/ null, /*not used*/ null);
+        resolvedCallback(null, null);
       }
     });
   }
@@ -231,31 +233,31 @@ export class AcquisitionManager {
       label: downloadedPackage.label,
     };
 
-    this._httpRequester.request(Http.Verb.POST, url, JSON.stringify(body), (error: Error, response: Http.Response): void => {
+    this._httpRequester.request(Http.Verb.POST, url, JSON.stringify(body), (error: Error | null, response: Http.Response): void => {
       if (callback) {
         if (error) {
-          callback(error, /*not used*/ null);
+          callback(error, null);
           return;
         }
 
         if (response.statusCode !== 200) {
-          callback(new Error(response.statusCode + ": " + response.body), /*not used*/ null);
+          callback(new Error(response.statusCode + ": " + response.body), null);
           return;
         }
 
-        callback(/*error*/ null, /*not used*/ null);
+        callback(null, null);
       }
     });
   }
 }
 
-function queryStringify(object: Object): string {
+function queryStringify(object: object): string {
   let queryString = "";
-  let isFirst: boolean = true;
+  let isFirst = true;
 
   for (const property in object) {
-    if (object.hasOwnProperty(property)) {
-      const value: string = (<any>object)[property];
+    if (Object.prototype.hasOwnProperty.call(object, property)) {
+      const value: string = (object as Record<string, string>)[property];
       if (!isFirst) {
         queryString += "&";
       }

@@ -1,9 +1,9 @@
 import * as fs from "fs";
-import * as chalk from "chalk";
+import chalk from "chalk";
 import * as path from "path";
 import * as childProcess from "child_process";
 import { coerce, compare, valid } from "semver";
-import { fileDoesNotExistOrIsDirectory } from "./utils/file-utils";
+import { fileDoesNotExistOrIsDirectory } from "../utils/file";
 
 const g2js = require("gradle-to-js/lib/parser");
 
@@ -144,7 +144,7 @@ function parseBuildGradleFile(gradleFile: string) {
 
 async function getHermesCommandFromGradle(gradleFile: string): Promise<string> {
   const buildGradle: any = await parseBuildGradleFile(gradleFile);
-  const hermesCommandProperty: any = Array.from(buildGradle["project.ext.react"] || []).find((prop: string) =>
+  const hermesCommandProperty: any = (Array.from(buildGradle["project.ext.react"] || []) as string[]).find((prop) =>
     prop.trim().startsWith("hermesCommand:")
   );
   if (hermesCommandProperty) {
@@ -156,7 +156,9 @@ async function getHermesCommandFromGradle(gradleFile: string): Promise<string> {
 
 export function getAndroidHermesEnabled(gradleFile: string): boolean {
   return parseBuildGradleFile(gradleFile).then((buildGradle: any) => {
-    return Array.from(buildGradle["project.ext.react"] || []).some((line: string) => /^enableHermes\s{0,}:\s{0,}true/.test(line));
+    return (Array.from(buildGradle["project.ext.react"] || []) as string[]).some((line) =>
+      /^enableHermes\s{0,}:\s{0,}true/.test(line)
+    );
   });
 }
 
@@ -206,7 +208,7 @@ async function getHermesCommand(gradleFile: string): Promise<string> {
   const fileExists = (file: string): boolean => {
     try {
       return fs.statSync(file).isFile();
-    } catch (e) {
+    } catch {
       return false;
     }
   };
@@ -251,8 +253,8 @@ function getReactNativePackagePath(): string {
 export function directoryExistsSync(dirname: string): boolean {
   try {
     return fs.statSync(dirname).isDirectory();
-  } catch (err) {
-    if (err.code !== "ENOENT") {
+  } catch (err: unknown) {
+    if ((err as NodeJS.ErrnoException).code !== "ENOENT") {
       throw err;
     }
   }
@@ -265,7 +267,7 @@ export function getReactNativeVersion(): string {
   try {
     packageJsonFilename = path.join(process.cwd(), "package.json");
     projectPackageJson = JSON.parse(fs.readFileSync(packageJsonFilename, "utf-8"));
-  } catch (error) {
+  } catch {
     throw new Error(
       `Unable to find or read "package.json" in the CWD. The "release-react" command must be executed in a React Native project folder.`
     );
