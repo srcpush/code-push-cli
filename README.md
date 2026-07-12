@@ -14,14 +14,17 @@ npm install -g @srcpush/code-push-cli
 srcpush login
 srcpush app add MyApp
 srcpush release-react MyApp ios -d Staging
+srcpush promote MyApp Staging Production
 ```
 
 ## Documentation
 
-- [Migration from App Center](docs/migration-from-appcenter.md)
-- [Command reference](docs/commands.md)
-- [Development guide](docs/development.md)
-- [Architecture](docs/architecture.md)
+| Guide | Description |
+|-------|-------------|
+| [Command reference](docs/commands.md) | All CLI commands with options and examples |
+| [Migration from App Center](docs/migration-from-appcenter.md) | Step-by-step App Center migration |
+| [Development](docs/development.md) | Build, test, and contribute |
+| [Architecture](docs/architecture.md) | Module layout and build pipeline |
 
 ## Requirements
 
@@ -29,4 +32,4 @@ srcpush release-react MyApp ios -d Staging
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE).
