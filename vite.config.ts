@@ -30,6 +30,7 @@ export default defineConfig({
     emptyOutDir: true,
     target: "node18",
     sourcemap: true,
+    minify: false,
     rollupOptions: {
       input: {
         cli: resolve(__dirname, "src/cli.ts"),
@@ -39,6 +40,8 @@ export default defineConfig({
       output: {
         format: "cjs",
         entryFileNames: "[name].js",
+        preserveModules: true,
+        preserveModulesRoot: "src",
         exports: "auto",
       },
     },
